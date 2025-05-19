@@ -15,16 +15,17 @@ def load_csv_from_github(url):
     response.raise_for_status()
     return pd.read_csv(io.StringIO(response.text))
 
-url = "https://github.com/Aditya-areete/Heat_score/releases/download/v-1/res_all_graphs.csv"
-df_graph = load_csv_from_github(url)
+df_graph = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/res_all_graphs.csv")
+df_graph_data = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/df_for_allgraphs.csv")
+df_main = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/final_r_f.csv")
 
 
 # Set page configuration
 st.set_page_config(page_title="Result Viewer", layout="wide")
 
 # Load the main DataFrame for the table
-df_main = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/final_r_f.csv")
-df_graph_data = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/df_for_allgraphs.csv")
+#df_main = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/final_r_f.csv")
+#df_graph_data = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/df_for_allgraphs.csv")
 
 # Load supporting data
 #df_graph_data = pd.read_csv('df_for_allgraphs.csv')  # for heat date lines
