@@ -23,10 +23,10 @@ df_graph = load_csv_from_github(url)
 st.set_page_config(page_title="Result Viewer", layout="wide")
 
 # Load the main DataFrame for the table
-df_main = pd.read_csv("/home/aditya/Heat_final/final_r_f.csv")
+df_main = pd.read_csv("final_r_f.csv")
 
 # Load supporting data
-df_graph_data = pd.read_csv('/home/aditya/Heat-score_all_graph/df_for_allgraphs.csv')  # for heat date lines
+df_graph_data = pd.read_csv('df_for_allgraphs.csv')  # for heat date lines
 #df_graph = pd.read_csv("/home/aditya/Heat-score_all_graph/res_all_graphs.csv")  # main graph data
 
 # Ensure datetime format
