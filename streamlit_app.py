@@ -9,27 +9,25 @@ import pandas as pd
 import requests
 import io
 
-@st.cache_data
-def load_csv_from_github(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    return pd.read_csv(io.StringIO(response.text))
+# @st.cache_data
+# def load_csv_from_github(url):
+#     response = requests.get(url)
+#     response.raise_for_status()
+#     return pd.read_csv(io.StringIO(response.text))
 
-df_graph = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/res_all_graphs.csv")
-df_graph_data = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/df_for_allgraphs.csv")
-df_main = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/final_r_f.csv")
+# url = "https://github.com/Aditya-areete/Heat_score/releases/download/v-1/res_all_graphs.csv"
+# df_graph = load_csv_from_github(url)
 
 
 # Set page configuration
 st.set_page_config(page_title="Result Viewer", layout="wide")
 
 # Load the main DataFrame for the table
-#df_main = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/final_r_f.csv")
-#df_graph_data = load_csv_from_github("https://github.com/Aditya-areete/Heat_score/releases/download/v-1/df_for_allgraphs.csv")
+df_main = pd.read_csv("/home/aditya/Heat_final/final_r_f.csv")
 
 # Load supporting data
-#df_graph_data = pd.read_csv('df_for_allgraphs.csv')  # for heat date lines
-#df_graph = pd.read_csv("/home/aditya/Heat-score_all_graph/res_all_graphs.csv")  # main graph data
+df_graph_data = pd.read_csv('/home/aditya/Heat-score_all_graph/df_for_allgraphs.csv')  # for heat date lines
+df_graph = pd.read_csv("/home/aditya/Heat-score_all_graph/res_all_graphs.csv")  # main graph data
 
 # Ensure datetime format
 df_graph['cdate_hr'] = pd.to_datetime(df_graph['cdate_hr'], errors='coerce')
