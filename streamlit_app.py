@@ -8,11 +8,11 @@ from datetime import datetime
 st.set_page_config(page_title="Result Viewer", layout="wide")
 
 # Load the main DataFrame for the table
-df_main = pd.read_csv("/home/aditya/all_devices_12h_wtd/final_r_f.csv")
+df_main = pd.read_csv("final_r_f.csv")
 
 # Load supporting data
-df_graph_data = pd.read_csv('/home/aditya/all_devices_12h_wtd/df_for_allgraphs.csv')  # for heat date lines
-df_graph = pd.read_csv("/home/aditya/all_devices_12h_wtd/res_all_graphs.csv")  # main graph data
+df_graph_data = pd.read_csv('df_for_allgraphs.csv')  # for heat date lines
+df_graph = pd.read_csv("res_all_graphs.csv")  # main graph data
 
 # Ensure datetime format
 df_graph['cdate_hr'] = pd.to_datetime(df_graph['cdate_hr'], errors='coerce')
