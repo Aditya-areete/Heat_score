@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 
@@ -10,36 +9,27 @@ st.set_page_config(page_title="Result Viewer", layout="wide")
 
 # Load the main DataFrames from Parquet using caching
 @st.cache_data
-def load_data():
-    df_main = pd.read_parquet("final_r_f.parquet")
-    df_graph_data = pd.read_parquet("df_for_allgraphs.parquet")
-    df_graph = pd.read_parquet("res_all_graphs.parquet")
-    return df_main, df_graph_data, df_graph
+def load_main_data():
+    df_main = pd.read_parquet("/home/aditya/all_devices_12h_wtd/final_r_f.parquet")
+    df_graph_data = pd.read_parquet("/home/aditya/all_devices_12h_wtd/df_for_allgraphs.parquet")
+    return df_main, df_graph_data
 
-df_main, df_graph_data, df_graph = load_data()
-
-# Ensure datetime format
-df_graph['cdate_hr'] = pd.to_datetime(df_graph['cdate_hr'], errors='coerce')
-df_graph_data['next_heat_date'] = pd.to_datetime(df_graph_data['next_heat_date'], errors='coerce')
-df_graph_data['next_heat_date_2'] = pd.to_datetime(df_graph_data['next_heat_date_2'], errors='coerce')
-
-df_graph['cdate_hr'] = df_graph['cdate_hr'].dt.tz_localize(None)
-df_graph_data['next_heat_date'] = df_graph_data['next_heat_date'].dt.tz_localize(None)
-df_graph_data['next_heat_date_2'] = df_graph_data['next_heat_date_2'].dt.tz_localize(None)
-
-# ✅ Use magnified score for visualization
-df_graph['window_heat_score'] = df_graph['magnified_score'].combine_first(df_graph['window_heat_score'])
+df_main, df_graph_data = load_main_data()
 
 # Convert date columns in df_main
 df_main['next_heat_date'] = pd.to_datetime(df_main['next_heat_date'], errors='coerce')
 df_main['next_heat_date_2'] = pd.to_datetime(df_main['next_heat_date_2'], errors='coerce')
+df_graph_data['next_heat_date'] = pd.to_datetime(df_graph_data['next_heat_date'], errors='coerce')
+df_graph_data['next_heat_date_2'] = pd.to_datetime(df_graph_data['next_heat_date_2'], errors='coerce')
+df_graph_data['next_heat_date'] = df_graph_data['next_heat_date'].dt.tz_localize(None)
+df_graph_data['next_heat_date_2'] = df_graph_data['next_heat_date_2'].dt.tz_localize(None)
 
 # ---- App Title ----
-st.title("\ud83d\udcca Heat Score Viewer")
+st.title("📊 Heat Score Viewer")
 
 # ---- Cluster Filter for Table ----
 if 'cluster' in df_main.columns and df_main['cluster'].notna().any():
-    st.subheader("\ud83d\udd0d Filter by Cluster")
+    st.subheader("🔍 Filter by Cluster")
     unique_clusters = sorted(df_main['cluster'].dropna().unique())
     selected_clusters = st.multiselect("Select Cluster(s)", unique_clusters, default=unique_clusters)
     df_main = df_main[df_main['cluster'].isin(selected_clusters)]
@@ -47,17 +37,30 @@ else:
     st.warning("No 'cluster' data available to filter.")
 
 # ---- Show Table ----
-st.markdown("### \ud83d\udccb Filtered Table")
+st.markdown("### 📋 Filtered Table")
 st.dataframe(df_main, use_container_width=True)
 
 # ---- Device Selection ----
-st.subheader("\ud83d\udcc8 DeviceID-wise Graph")
+st.subheader("📈 DeviceID-wise Graph")
 device_ids = df_graph_data['deviceid'].unique()
 selected_deviceid = st.selectbox("Select a Device ID", device_ids)
 
+# ---- Load Per-Device Data ----
+@st.cache_data
+def load_device_data(device_id):
+    return pd.read_parquet(f"/home/aditya/device_data/{device_id}.parquet")
+
+filtered_graph_data = load_device_data(selected_deviceid)
+
+# Ensure datetime format
+filtered_graph_data['cdate_hr'] = pd.to_datetime(filtered_graph_data['cdate_hr'], errors='coerce')
+filtered_graph_data['cdate_hr'] = filtered_graph_data['cdate_hr'].dt.tz_localize(None)
+
+# ✅ Use magnified score for visualization
+filtered_graph_data['window_heat_score'] = filtered_graph_data['magnified_score'].combine_first(filtered_graph_data['window_heat_score'])
+
 # ---- Plot 1: Plotly Line Plot ----
-st.markdown("### \ud83d\udd2512Hr_ Heat Score Over Time with Next Heat Dates")
-filtered_graph_data = df_graph[df_graph['deviceid'] == selected_deviceid]
+st.markdown("### 🔥12Hr_ Heat Score Over Time with Next Heat Dates")
 
 if not filtered_graph_data.empty:
     fig1 = px.line(
@@ -107,7 +110,7 @@ else:
     st.warning(f"No graph data found for DeviceID: {selected_deviceid}")
 
 # ---- Feedback Section ----
-# st.subheader("\u2705 Team Feedback on Prediction")
+# st.subheader("✅ Team Feedback on Prediction")
 
 # feedback_option = st.radio("Is the predicted heat date accurate?", ["Yes", "No"], index=0, horizontal=True)
 # user_comment = st.text_input("Add optional comment (e.g. observed signs, cycle confirmation):")
@@ -130,4 +133,4 @@ else:
 #     else:
 #         df_feedback.to_csv(feedback_file, index=False)
 
-#     st.success("\u2705 Feedback saved locally in feedback_log.csv.")
+#     st.success("✅ Feedback saved locally in feedback_log.csv.")
